@@ -226,16 +226,22 @@ int process(char *buffer, int buffIndex, int *inComment)
 	{
 		// add to list
 		// increment lex_index
+		list[lex_index].type = andsym;
+		lex_index++;
 	}
 	else if (strcmp(buffer, "||"))
 	{
 		// add to list
 		// increment lex_index
+		list[lex_index].type = orsym;
+		lex_index++;
 	}
 	else if (strcmp(buffer, "!"))
 	{
 		// add to list
 		// increment lex_index
+		list[lex_index].type = notsym;
+		lex_index++;
 	}
 	// Check if identifider or number or error
 	else
