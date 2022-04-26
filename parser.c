@@ -39,6 +39,7 @@ void block();
 void constDeclaration();
 int varDeclaration();
 void procDeclaration();
+void logic();
 void statement();
 void condition();
 void expression();
@@ -237,6 +238,7 @@ void constDeclaration()
 
 int varDeclaration()
 {
+
 	int counter = 0;
 	// structure after picking up initial var declaration:
 	// identifier -> {, -> identifier} -> semicolon
@@ -343,8 +345,57 @@ void procDeclaration()
 	get_next_token();
 }
 
+void logic()
+{
+	get_next_token(); 
+
+	if (token.type == notsym)
+	{
+		get_next_token();
+
+		condition();
+		if (error == 1)
+			return;
+		// emit NOT
+		emit(2, 0, 14);
+	}
+	else
+	{
+		condition();
+		if (error == 1)
+			return;
+
+		get_next_token();
+
+		while (token.type == andsym || token.type == orsym)
+		{
+			if (token.type == andsym)
+			{
+				condition();
+				if (error == 1)
+					return;
+				// emit AND
+				emit(2, 0, 12);
+			}
+			else
+			{
+				condition();
+				if (error == 1)
+					return;
+				// emit ORR
+				emit(2, 0, 13);
+			}
+
+			stacksize--;
+
+			get_next_token();
+		}
+	}
+}
+
 void statement()
 {
+	
 	int symIdx = -1;
 	int jpcIdx = -1;
 	int jmpIdx = -1;
@@ -376,6 +427,9 @@ void statement()
 		}
 
 		get_next_token(); // equalsymbol
+
+		if (token.type == numbersym)
+			printf("number\n");
 
 		// variables must be assigned using :=
 		if (token.type != assignsym)
@@ -431,12 +485,16 @@ void statement()
 	// if statement
 	else if (token.type == ifsym)
 	{
-		get_next_token(); // get next token
+		get_next_token();
 
-		condition(); // implied that this gets next token
+		logic();
 
 		if (error == 1)
 			return;
+
+		get_next_token(); // get next token
+
+		printf("%d %s\n", token.value, token.name);
 
 		if (token.type != thensym)
 		{
@@ -484,6 +542,22 @@ void statement()
 	// while statement
 	else if (token.type == whilesym)
 	{
+		get_next_token();
+
+		logic();
+
+		if (error == 1)
+			return;
+
+		get_next_token();
+
+		if (token.type != dosym)
+		{
+			printparseerror(9);
+			error = 1;
+			return;
+		}
+
 		get_next_token();
 
 		loopIdx = cIndex;
@@ -592,7 +666,7 @@ void statement()
 		stacksize--;
 	}
 
-	// call statement()
+	// call statement
 	else if (token.type == callsym)
 	{
 		get_next_token(); // identifier
@@ -636,69 +710,81 @@ void statement()
 
 void condition()
 {
-	// call expression()
-	expression();
+	if (token.type == lparensym)
+	{
+		logic();
 
-	if (error == 1)
-		return;
-
-	// process current token
-	if (token.type == eqlsym)
-	{
-		get_next_token();
-		expression();
 		if (error == 1)
 			return;
-		emit(2, 0, 6); // emit EQL
-	}
-	else if (token.type == neqsym)
-	{
+			
 		get_next_token();
-		expression();
-		if (error == 1)
-			return;
-		emit(2, 0, 7); // emit NEQ
-	}
-	else if (token.type == lsssym)
-	{
-		get_next_token();
-		expression();
-		if (error == 1)
-			return;
-		emit(2, 0, 8); // emit LSS
-	}
-	else if (token.type == leqsym)
-	{
-		get_next_token();
-		expression();
-		if (error == 1)
-			return;
-		emit(2, 0, 9); // emit LEQ
-	}
-	else if (token.type == gtrsym)
-	{
-		get_next_token();
-		expression();
-		if (error == 1)
-			return;
-		emit(2, 0, 10); // emit GTR
-	}
-	else if (token.type == geqsym)
-	{
-		get_next_token();
-		expression();
-		if (error == 1)
-			return;
-		emit(2, 0, 11); // emit GEQ
 	}
 	else
 	{
-		printparseerror(10);
-		error = 1;
-		return;
-	}
+		// call expression()
+		expression();
 
-	stacksize--;
+		if (error == 1)
+			return;
+
+		// process current token
+		if (token.type == eqlsym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 6); // emit EQL
+		}
+		else if (token.type == neqsym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 7); // emit NEQ
+		}
+		else if (token.type == lsssym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 8); // emit LSS
+		}
+		else if (token.type == leqsym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 9); // emit LEQ
+		}
+		else if (token.type == gtrsym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 10); // emit GTR
+		}
+		else if (token.type == geqsym)
+		{
+			get_next_token();
+			expression();
+			if (error == 1)
+				return;
+			emit(2, 0, 11); // emit GEQ
+		}
+		else
+		{
+			printparseerror(10);
+			error = 1;
+			return;
+		}
+
+		stacksize--;
+	}
 }
 
 void expression()
@@ -905,11 +991,6 @@ void factor()
 		error = 1;
 		return;
 	}
-}
-
-void logic()
-{
-	// insert function details here
 }
 
 // adds a line of code to the program

@@ -142,105 +142,143 @@ int process(char *buffer, int buffIndex, int *inComment)
 		list[lex_index].type = writesym;
 		lex_index++;
 	}
+	else if (strcmp(buffer, "&&") == 0)
+	{
+		// add to list
+		// increment lex_index
+		strcpy(list[lex_index].name, "andsym");
+		list[lex_index].value = 32;
+		list[lex_index].type = andsym;
+		lex_index++;
+	}
+	else if (strcmp(buffer, "||") == 0)
+	{
+		// add to list
+		// increment lex_index
+		strcpy(list[lex_index].name, "orsym");
+		list[lex_index].value = 33;
+		list[lex_index].type = orsym;
+		lex_index++;
+	}
+	else if (strcmp(buffer, "!") == 0)
+	{
+		// add to list
+		// increment lex_index
+		strcpy(list[lex_index].name, "notsym");
+		list[lex_index].value = 34;
+		list[lex_index].type = notsym;
+		lex_index++;
+	}
 	else if (strcmp(buffer, "==") == 0)
 	{
+		strcpy(list[lex_index].name, "eqlsym");
 		list[lex_index].type = eqlsym;
+		list[lex_index].value = 1;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "!=") == 0)
 	{
+		strcpy(list[lex_index].name, "neqsym");
 		list[lex_index].type = neqsym;
+		list[lex_index].value = 3;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "<") == 0)
 	{
+		strcpy(list[lex_index].name, "lsssym");
 		list[lex_index].type = lsssym;
+		list[lex_index].value = 5;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "<=") == 0)
 	{
+		strcpy(list[lex_index].name, "leqsym");
 		list[lex_index].type = leqsym;
+		list[lex_index].value = 7;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ">") == 0)
 	{
+		strcpy(list[lex_index].name, "gtrsym");
 		list[lex_index].type = gtrsym;
+		list[lex_index].value = 9;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ">=") == 0)
 	{
+		strcpy(list[lex_index].name, "geqsym");
 		list[lex_index].type = geqsym;
+		list[lex_index].value = 11;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "*") == 0)
 	{
+		strcpy(list[lex_index].name, "multsym");
 		list[lex_index].type = multsym;
+		list[lex_index].value = 13;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "/") == 0)
 	{
+		strcpy(list[lex_index].name, "divsym");
 		list[lex_index].type = divsym;
+		list[lex_index].value = 15;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "+") == 0)
 	{
+		strcpy(list[lex_index].name, "plussym");
 		list[lex_index].type = plussym;
+		list[lex_index].value = 17;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "-") == 0)
 	{
+		strcpy(list[lex_index].name, "minussym");
 		list[lex_index].type = minussym;
+		list[lex_index].value = 19;
 		lex_index++;
 	}
 	else if (strcmp(buffer, "(") == 0)
 	{
+		strcpy(list[lex_index].name, "lparensym");
 		list[lex_index].type = lparensym;
+		list[lex_index].value = 21;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ")") == 0)
 	{
+		strcpy(list[lex_index].name, "rparensym");
 		list[lex_index].type = rparensym;
+		list[lex_index].value = 23;
 		lex_index++;
 	}	
 	else if (strcmp(buffer, ",") == 0)
 	{
+		strcpy(list[lex_index].name, "commasym");
 		list[lex_index].type = commasym;
+		list[lex_index].value = 25;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ".") == 0)
 	{
+		strcpy(list[lex_index].name, "periodsym");
 		list[lex_index].type = periodsym;
+		list[lex_index].value = 27;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ";") == 0)
 	{
+		strcpy(list[lex_index].name, "semicolonsym");
 		list[lex_index].type = semicolonsym;
+		list[lex_index].value = 29;
 		lex_index++;
 	}
 	else if (strcmp(buffer, ":=") == 0)
 	{
+		strcpy(list[lex_index].name, "assignsym");
 		list[lex_index].type = assignsym;
-		lex_index++;
-	}
-	else if (strcmp(buffer, "&&"))
-	{
-		// add to list
-		// increment lex_index
-		list[lex_index].type = andsym;
-		lex_index++;
-	}
-	else if (strcmp(buffer, "||"))
-	{
-		// add to list
-		// increment lex_index
-		list[lex_index].type = orsym;
-		lex_index++;
-	}
-	else if (strcmp(buffer, "!"))
-	{
-		// add to list
-		// increment lex_index
-		list[lex_index].type = notsym;
+		list[lex_index].value = 31;
 		lex_index++;
 	}
 	// Check if identifider or number or error
@@ -328,6 +366,7 @@ lexeme *lexanalyzer(char *input, int printFlag)
 				// Safe to restart the buffer
 				buffIndex = 0;
 			}
+
 			// New character is not a space
 			else
 			{
@@ -401,23 +440,45 @@ lexeme *lexanalyzer(char *input, int printFlag)
 							buffIndex = 0;
 							break;
 						case '=':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '!':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '<':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '>':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '*':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '/':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case '+':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						case ':':
-							if (inComment == 0)
-							{
-								buffer[buffIndex] = charIn;
-								buffIndex++;
-								break;
-							}
-							else
-							{
-								break;
-							}
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
+						case '&':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
+						case '|':
+							buffer[buffIndex] = charIn;
+							buffIndex++;
+							break;
 						// ERROR: Invalid symbol
 						default:
 							printlexerror(4);
@@ -439,9 +500,10 @@ lexeme *lexanalyzer(char *input, int printFlag)
 		return NULL;
 	}
 
-	
-	if (printFlag)
-		printtokens();
+	/*if (printFlag)
+		printtokens();*/
+
+	printtokens();
 
 	// these last two lines are really important for the rest of the package to run
 	list[lex_index].type = -1;
@@ -549,6 +611,15 @@ void printtokens()
 				break;
 			case numbersym:
 				printf("%11d\t%d", list[i].value, numbersym);
+				break;
+			case andsym:
+				printf("%11s\t%d", "&&", andsym);
+				break;
+			case orsym:
+				printf("%11s\t%d", "||", orsym);
+				break;
+			case notsym:
+				printf("%11s\t%d", "!", notsym);
 				break;
 		}
 		printf("\n");
